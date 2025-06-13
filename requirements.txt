@@ -1,3 +1,4 @@
 lxml
-BeautifulSoup
+BeautifulSoup4
 requests
+pydantic
