@@ -1,3 +1,1 @@
-# Crawler_BeautifulSoup
-# Crawler_BeautifulSoup
-# Crawler_requests
+# Created a simple web crawler using python requests library
