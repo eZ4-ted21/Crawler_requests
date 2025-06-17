@@ -1,5 +1,16 @@
 from extract_strat import Extract
+from model import Data
+
 
 url = 'https://geeksforgeeks.org'
-data = Extract().execute(url)
-print(str(data))
+scraped_data = Extract().execute(url)
+# print(scraped_data)
+
+
+data = Data(
+    title=scraped_data['title'],
+    url=scraped_data['url']
+    )
+
+for item in data:
+    print(item)
