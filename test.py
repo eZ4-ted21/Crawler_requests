@@ -1,16 +1,14 @@
 from extract_strat import Extract
-from model import Data
+# from model import Data
 
 
-url = 'https://geeksforgeeks.org'
+url = 'https://urbangadgets.ph/category/aerial-photography/drone/?srsltid=AfmBOoq2ykFbvAeqBvZOAVZN9OA0nx_RoFbIeE_uoKCTS55CkxhBEHbf'
 scraped_data = Extract().execute(url)
-# print(scraped_data)
+print(scraped_data)
 
+# data = Data(
+#     title=scraped_data['title'],f
+#     url=scraped_data['url']
+#     )
 
-data = Data(
-    title=scraped_data['title'],
-    url=scraped_data['url']
-    )
-
-for item in data:
-    print(item)
+# for item in data:    print(item)
