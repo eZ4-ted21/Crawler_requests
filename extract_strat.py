@@ -57,23 +57,26 @@ class Extract():
             for tag in tags:
 
                 #get data with data type validation 
-                dataModel = Data(
-                    title = self.getTitle(tag),
-                    url = self.getUrl(tag),
-                    price = self.getPrice(tag)
-                )
+                _data = self.validateData(tag)
 
-                #get data per Rank
                 dataPerRank = {
                     f"Rank : {self.rank}" : {
-                        "title" : dataModel.title,
-                        "url" : dataModel.url,
-                        "price": dataModel.price
+                        "title" : _data.title,
+                        "url" : _data.url,
+                        "price": _data.price
                         }
                 }
                 dataPerPage.append(dataPerRank)
                 self.rank +=1
         return dataPerPage
+    
+    def validateData(self, tag):
+        data = Data(
+                    title = self.getTitle(tag),
+                    url = self.getUrl(tag),
+                    price = self.getPrice(tag)
+                )
+        return data
     
 
     def getTitle(self, tag) -> str:
