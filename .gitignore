@@ -1,0 +1,12 @@
+# Ignore credentials
+gs_creds.json
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+.vscode/
+env/
+
+#ignore secrets
+.env
+
