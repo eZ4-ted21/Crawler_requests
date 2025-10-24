@@ -5,12 +5,12 @@ from save_output import SaveOutput
 
 url = 'https://urbangadgets.ph/category/aerial-photography/drone/?srsltid=AfmBOoq2ykFbvAeqBvZOAVZN9OA0nx_RoFbIeE_uoKCTS55CkxhBEHbf'
 
-def _getRankData(page_key, rd_key, rank_data):
+def _getRankData(page_key, rd_key, rank_data) -> dict:
     try:
         rankData = {
             'PAGE' : re.sub(r'[^0-9.,]', '', page_key),
             'RANK': re.sub(r'[^0-9.,]', '', rd_key),
-            'TITLE' : rank_data.get('price'),
+            'TITLE' : rank_data.get('title'),
             'URL' : rank_data.get('url'),
             'PRICE' : rank_data.get('price')
         }
@@ -18,7 +18,7 @@ def _getRankData(page_key, rd_key, rank_data):
         print(f'x] Unhandled Exeption encountered while getting Data per Rank {e}')
     return rankData
 
-def _getListData(scraped_data):
+def _getListData(scraped_data) -> list[dict]:
     try:
         data = []
         for page in scraped_data:
@@ -33,8 +33,9 @@ def _getListData(scraped_data):
     return data
 
 if __name__ == '__main__':
-    scraped_data = Extract().execute(url)
+    scraped_data = Extract(url).execute()
     print(scraped_data)
+    sheet = 'Drones'
     data = _getListData(scraped_data)
-    SaveOutput().saveToCSV(data)
-    SaveOutput().saveToGoogleSheet()
+    SaveOutput(data, sheet).saveToCSV()
+    SaveOutput(data, sheet).saveToGoogleSheet()
