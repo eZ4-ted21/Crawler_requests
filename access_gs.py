@@ -11,14 +11,10 @@ class AccessGoogleSheet():
         getWorkSheet() : Gets Worksheet where the data should be uploaded.
     """
     
-    def __init__(self, sheet : str):
+    def __init__(self):
         """
         Initialize a new instance of the class with sheet.
-
-        Attributes : 
-            sheet (str) : the name or identifier of the Google sheet worksheet where the data should be uploaded.
         """
-        self.sheet = sheet
 
     def getWorkBook(self) -> gspread.spreadsheet.Spreadsheet:
         """
@@ -44,7 +40,7 @@ class AccessGoogleSheet():
             print(f'[x] Exeption encountered while getting access to google Workbook : {e}')
         return workbook
     
-    def getWorkSheet(self) -> gspread.worksheet.Worksheet:
+    def getWorkSheet(self, sheet : str) -> gspread.worksheet.Worksheet:
         """
         Retrieve a specific worksheet from the connected Google Sheets workbook.
 
@@ -58,7 +54,7 @@ class AccessGoogleSheet():
         """
         try: 
             workbook = self.getWorkBook()
-            newSheet = workbook.worksheet(self.sheet)
+            newSheet = workbook.worksheet(sheet)
         except Exception as e:
             print(f'[x] Exception ecncountered while getting access to worksheet : {e}')
         return newSheet
