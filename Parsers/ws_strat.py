@@ -1,7 +1,7 @@
 import re
 from bs4 import BeautifulSoup
-from dl_strat import Downloader
-from model import DataModel
+from Downloaders.dl_strat import Downloader
+from DataModels.model import DataModel
 
 
 class Extract():
@@ -94,9 +94,12 @@ class Extract():
         """
         try:
             self.nextUrl = None
-            tag = soup.find('a',{'class':'next page-number'})
+            tag = soup.find('a',{'class':'next page-number'}) or soup.find('a', {'class':'pagination__item pagination__item--next pagination__item-arrow motion-reduce'})
             if tag and tag.has_attr('href'):
-                self.nextUrl = tag['href']
+                url = tag['href']
+                if not 'http' in url:
+                    url = f'https://urbangadgets.ph/{url}'
+                self.nextUrl = url
         except Exception as e:
             print(f'[x] Error ecounterd while fetching next url from page : {self.page}.')
         return self.nextUrl
@@ -128,7 +131,7 @@ class Extract():
         self.nextUrl = self.getNextUrl(soup)
         dataPerPage = []
 
-        tags = soup.find_all("div",{'class':'product-small box'})
+        tags = soup.find_all("div",{'class':'product-card product-card-style-standard'})
         
         if tags:
             for tag in tags:
@@ -163,12 +166,11 @@ class Extract():
             - Calls methods getTitle, getURL and getPrice
             - Validates value if data type is correct using pydantic.
         """
-        data = DataModel(
+        return DataModel(
                     title = self.getTitle(tag),
                     url = self.getUrl(tag),
                     price = self.getPrice(tag)
                 )
-        return data
     
 
     def getTitle(self, tag : BeautifulSoup) -> str:
@@ -190,7 +192,7 @@ class Extract():
         """
         try:
             title = 'Not Found'
-            titleTag = tag.find('p',{'class':'name product-title woocommerce-loop-product__title'})
+            titleTag = tag.find('p',{'class':'name product-title woocommerce-loop-product__title'}) or tag.find('a',{'class':'reversed-link'})
             if titleTag:
                 title = titleTag.get_text().strip()
         except Exception as e:
@@ -217,9 +219,11 @@ class Extract():
         """
         try:
             url = 'Not Found'
-            urlTag = tag.find('a',{'class':'woocommerce-LoopProduct-link woocommerce-loop-product__link'})
+            urlTag = tag.find('a',{'class':'reversed-link'})
             if urlTag and urlTag.has_attr('href'):
                 url = urlTag['href']
+                if not 'https:' in url:
+                    url = f'https://urbangadgets.ph{url}'
         except Exception as e:
             print(f'[x] Unhandled exception while fetching url on rank-{self.rank}: {e}')
         return url
@@ -243,7 +247,7 @@ class Extract():
         """
         try:
             price : str = '0.00'
-            priceTag = tag.find('span',{'class':'price'})
+            priceTag = tag.find('span',{'class':'price'}) or tag.find('span', {'class':'f-price-item f-price-item--sale'})
             if priceTag:
                 price = priceTag.text
         except Exception as e:

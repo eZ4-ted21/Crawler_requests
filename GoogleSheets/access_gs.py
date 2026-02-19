@@ -32,7 +32,7 @@ class AccessGoogleSheet():
         try:
             gs_id = os.getenv("GS_ID")
             scopes = ["https://www.googleapis.com/auth/spreadsheets"]
-            creds = Credentials.from_service_account_file("gs_creds.json", scopes=scopes)
+            creds = Credentials.from_service_account_file("GoogleSheets/gs_creds.json", scopes=scopes)
             client = gspread.authorize(creds)
             sheet_id = gs_id
             workbook = client.open_by_key(sheet_id)

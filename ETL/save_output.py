@@ -1,6 +1,6 @@
 import csv
-from access_gs import AccessGoogleSheet
-from access_db import GetDBConnection
+from GoogleSheets.access_gs import AccessGoogleSheet
+from DB.access_db import GetDBConnection
 
 class SaveOutput():
     """

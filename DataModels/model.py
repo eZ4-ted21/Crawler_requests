@@ -11,12 +11,9 @@ class DataModel(BaseModel):
     traceability, and reproducibility across systems.
 
     Fields:
-    - url (str): 
-        the product url
-    - title (str): 
-        the product title or product name
-    - price (str):
-        the product price
+        url (str): the product url
+        title (str): the product title or product name
+        price (str):the product price
     """
     url : str
     title : str
