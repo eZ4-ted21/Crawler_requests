@@ -36,7 +36,7 @@ class Transformer():
         Args:
             rank (str) : the rank iindicator of a product.
         """
-        return re.sub(r'[^0-9]', '', rank),
+        return re.sub(r'[^0-9]', '', rank)
     
     def transformTitle(self, title:str) ->str:
         """
