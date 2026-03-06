@@ -12,7 +12,6 @@ WORKDIR /crawler_requests
 
 # Copy requirements first (better caching)
 COPY requirements.txt .
-COPY gs_creds.json .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt

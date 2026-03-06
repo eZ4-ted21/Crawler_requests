@@ -2,10 +2,10 @@ import csv
 from GoogleSheets.access_gs import AccessGoogleSheet
 from DB.access_db import GetDBConnection
 
-class SaveOutput():
+class SaveOutput:
     """
     A class that represents saving Data into CSV and Googlesheets.
-    TODO : save data to a postgressql database.
+    TODO : save data to a postgres database.
 
     Attributes :
         data (list of dict) : the list of scraped data.
@@ -13,7 +13,7 @@ class SaveOutput():
 
     Methods :
         saveToCSV() : the method that saves data to CSV.
-        saveToGooglesheets() : the method that saves data to Googlesheet.
+        saveToGooglesheets() : the method that saves data to Google sheet.
         TODO : method for saving data to Database.
     """
 
@@ -27,13 +27,13 @@ class SaveOutput():
 
         Attributes:
             data (list of dict): Stores the data provided during initialization.
-            worksheet (AccessGoogleSheet): An instance used to interact with the specified Google Sheet worksheet for reading or writing data.
+            work_sheet (AccessGoogleSheet): An instance used to interact with the specified Google Sheet worksheet for reading or writing data.
         """
         self.data = data
-        self.worksheet = AccessGoogleSheet()
+        self.work_sheet = AccessGoogleSheet()
         self.dbConn = GetDBConnection()
 
-    def saveToCSV(self):
+    def save_to_csv(self):
         """
         Save the provided data to a CSV file named 'output.csv'.
 
@@ -49,10 +49,10 @@ class SaveOutput():
                 writer.writeheader()
                 writer.writerows(self.data)
         except Exception as e:
-            print(f'[x] Unhandled exeption encountered on saving data to CSV : {e}.')
+            print(f'[x] Unhandled exception encountered on saving data to CSV : {e}.')
         print('Saved Data to CSV file.')
 
-    def saveToGoogleSheet(self, sheet):
+    def save_to_google_sheet(self, sheet):
         """
         Upload data from a local CSV file ('output.csv') to a specified Google Sheet.
 
@@ -67,29 +67,25 @@ class SaveOutput():
             - Prints a confirmation message upon successful upload.
         """
         try:
-            newSheet = self.worksheet.getWorkSheet(sheet)
-            newSheet.clear()
+            new_sheet = self.work_sheet.get_work_sheet(sheet)
+            new_sheet.clear()
             with open('output.csv', 'r', newline='') as f:
                 reader = csv.reader(f)
                 rows = list(reader) 
-                newSheet.update(rows) 
+                new_sheet.update(rows)
         except Exception as e:
-            print(f'[x] Unhandled exeption encountered on saving data to Google Sheets : {e}.')
+            print(f'[x] Unhandled exception encountered on saving data to Google Sheets : {e}.')
         print("CSV data uploaded to Google Sheet.")
 
 
-    def saveToDB(self, uuid : str):
+    def save_to_db(self, uuid : str):
         """
         Saves data to database.
 
         Args:
             uuid (str) : the unique identifier for the category url.
 
-        Attributes :
-            conn : the database connection
-            cursor : sends sql command to the database
-
-        Behaviour :
+        Behavior :
             - Gets database connection
             - loops on the data list and save each data into the category_data.
             - closes database connection after saving data
@@ -105,14 +101,15 @@ class SaveOutput():
             """
 
             for dt in self.data:
-                prdData = (dt['PAGE'], dt['RANK'], dt['TITLE'], dt['URL'], dt['PRICE'], uuid)
-                cur.execute(insert_query, prdData)
+                prd_data = (dt['PAGE'], dt['RANK'], dt['TITLE'], dt['URL'], dt['PRICE'], uuid)
+                cur.execute(insert_query, prd_data)
 
             # # Commit changes
             conn.commit()
             cur.close()
+            conn.close()
         except Exception as e:
-            print(f'[x] Unhandled exeption encountered on saving data to Database : {e}.')
-        print("Succesfully save data to database.")
-        conn.close()
+            print(f'[x] Unhandled exception encountered on saving data to Database : {e}.')
+        print("Successfully save data to database.")
+
     

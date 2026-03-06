@@ -1,16 +1,13 @@
 import requests
 
-class Downloader():
+class Downloader:
     """
     A class to represent a downloader.
 
-    Attributes:
-        url (str ) : the url to be scrape
-
     Methods:
-        download(url) : the method for requesting html source for the given url.
-        getHeaders() : the method that generates headers later to be used as parameters for requesting html source.
-        getCookies() : the method that generates cookies later to bu used as parameters for requesting html source.
+        download(url) : the method for requesting HTML source for the given url.
+        getHeaders() : the method that generates headers later to be used as parameters for requesting HTML source.
+        getCookies() : the method that generates cookies later to be used as parameters for requesting HTML source.
     """
 
     def __init__(self):
@@ -18,46 +15,47 @@ class Downloader():
         Initialize a new instance of class with the url
 
         Args :
-            url (str) : the url to be scrape
+            url (str) : the url to be scraped
         """
         self.headers = None
         self.cookies = None
 
-    def download(self, url : str) -> str:
+    def download(self, url : str) -> str | None:
         """
         Sends Requests using the given url and get the response
 
-        Returns html source as rawData
+        Returns HTML source as rawData
 
         Attributes :
             response (Response) : the response from the executed requests
-            rawdata (str) : the html source from the response
+            rawdata (str) : the HTML source from the response
 
-        Behaviour :
+        Behavior :
             - calls getHeaders method
             - send requests for the given url
             - checks response status code
             - get response text if status code is 200
         """
         try:
-            rawData = None
-            self.headers = self.getHeaders()
+            raw_data = None
+            self.headers = self.get_headers()
             response = requests.get(url, headers=self.headers, cookies=self.cookies, timeout=10000)
             print(response.status_code)
             if response.status_code == 200:
-                rawData = response.text
+                raw_data = response.text
+            return raw_data
         except Exception as e:
             print(f'[x] Download Failure Exception{e}.')
-        return rawData
-    
-    def getHeaders(self) -> dict:
+
+    @staticmethod
+    def get_headers() -> dict:
         """
         Generates headers
 
         Returns Headers
 
         Attributes :
-            headers (dict) : the necessary headers later to be used as request parametes
+            headers (dict) : the necessary headers later to be used as request parameters
         """
         headers = {
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -68,11 +66,12 @@ class Downloader():
             'Sec-Fetch-Dest': 'document',
             'Sec-Fetch-Mode': 'navigate',
             'Sec-Fetch-Site': 'none',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Safari/605.1.15'
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (HTML, like Gecko) Version/18.5 Safari/605.1.15'
         }
         return headers
 
-    def getCookies(self):
+    @staticmethod
+    def get_cookies():
         """
         TODO : Generate cookies
         """

@@ -1,10 +1,12 @@
-import re
+from typing import Any
+
 from bs4 import BeautifulSoup
+
 from Downloaders.dl_strat import Downloader
 from DataModels.model import DataModel
 
 
-class Extract():
+class Extract:
     """
     A class that represents the scraper strategy.
 
@@ -12,13 +14,13 @@ class Extract():
         url (str) : The url to scrape.
 
     Methods :
-        Execute() : the method that executes scraping process for all pages.
-        getDataPerPage() : the method for scraping data for each page.
-        getNextUrl() : the method for getting next url.
+        execute() : the method that executes scraping process for all pages.
+        get_data_per_page() : the method for scraping data for each page.
+        get_next_url() : the method for getting next url.
         validateData() : the method for pydantic data type validation.
-        getTitile() : the method for fetching title for each product.
-        getURL() : the method for fetching url for each product.
-        getPrice() : the method for fetching price for each product.
+        get_title() : the method for fetching title for each product.
+        get_url() : the method for fetching url for each product.
+        get_price() : the method for fetching price for each product.
     """
 
     def __init__(self, url : str):
@@ -31,13 +33,13 @@ class Extract():
         Attributes :
             rank (int) : represents the arrangements of products.
             page (int) : represents the page number.
-            nextUrl : The URL to be scrape. changes its value when navigating to next page.
+            nextUrl : The URL to be scraped. changes its value when navigating to next page.
             downloader : Represents the downloader method.
         """
         self.rank = 1
         self.page = 1
-        self.nextUrl = url
-        self.downloder = Downloader()
+        self.next_url = url
+        self.downloader = Downloader()
 
     def execute(self) -> list[dict]:
         """
@@ -48,88 +50,89 @@ class Extract():
         Attributes :
             dataAllPage (list) : an empty list that represents as a temporary storage for scraped data.
 
-        Behaviour :
+        Behavior :
             - Calls download method from Downloader class with the url to scrape.
             - Calls getDataPerPage method to fetch data.
             - Store all scraped data into dataAllPage.
             - Increments page number when scraping in previous page is successful.
             - Stops the loop when scraping is either done or unsuccessful.
         """
-        dataAllPage : list = []
+        data_all_page : list = []
 
         while True:
             try:
-                if not self.nextUrl:
+                if not self.next_url:
                     break
                 
                 print(f'Requesting on page : {self.page}')
-                rawData = self.downloder.download(self.nextUrl)
-                if not rawData: 
+                raw_data = self.downloader.download(self.next_url)
+                if not raw_data:
                     break
 
-                dataPerPage = self.getDataPerPage(rawData)
-                if not dataPerPage: 
+                data_per_page = self.get_data_per_page(raw_data)
+                if not data_per_page:
                     break
 
-                dataAllPage.append({f'page {self.page}':dataPerPage})
+                data_all_page.append({f'page {self.page}':data_per_page})
                 self.page+=1
             except Exception as e:
-                print(f'[x] Download Failure excepteion : {e}.')
-        return dataAllPage
+                print(f'[x] Download Failure Exception : {e}.')
+        return data_all_page
         
-    def getNextUrl(self, soup) -> str:
+    def get_next_url(self, soup) -> str | None | Any:
         """
-        Navigate to html element where next url can be found.
+        Navigate to HTML element where next url can be found.
 
         Returns next URL.
 
         Args : 
-            soup (BeautifulSoup) : the html source that holds data.
+            soup (BeautifulSoup) : the HTML source that holds data.
 
         Attributes :
-            tag (str) : represents the specific element where next url can be fetch.
+            tag (str) : represents the specific element where next url can be fetched.
 
-        Behaviour :
-            - Navigate to an html element and check if the next url exist.
+        Behavior :
+            - Navigate to an HTML element and check if the next url exist.
         """
         try:
-            self.nextUrl = None
+            self.next_url = None
             tag = soup.find('a',{'class':'next page-number'}) or soup.find('a', {'class':'pagination__item pagination__item--next pagination__item-arrow motion-reduce'})
             if tag and tag.has_attr('href'):
                 url = tag['href']
                 if not 'http' in url:
                     url = f'https://urbangadgets.ph/{url}'
-                self.nextUrl = url
+                self.next_url = url
+            return self.next_url
         except Exception as e:
-            print(f'[x] Error ecounterd while fetching next url from page : {self.page}.')
-        return self.nextUrl
+            print(f'[x] Error encountered while fetching next url from page : {self.page} - {e}.')
+
         
-    def getDataPerPage(self, rawData : str) -> list[dict]:
+    def get_data_per_page(self, raw_data : str) -> list[dict]:
         """
         Gets all product data in a page.
 
         Returns list of product data in a single page.
 
         Args :
-            rawData (str) : the html source for a single page.
+            rawData (str) : the HTML source for a single page.
 
         Attributes :
-            soup (BeautifulSoup) : the html source.
+            soup (BeautifulSoup) : the HTML source.
             dataPerPage (list) : represents the list of data in a single page.
-            tags (BeautifulSoup) : the list of html elements that holds data per product.
+            tags (BeautifulSoup) : the list of HTML elements that holds data per product.
             dataPerRank (dict) : represents the data of a product.
             rank (int) : the rank of each product.
 
-        Behaviour :
+        Behavior :
             - Calls getNextUrl method with the parameter soup.
-            - Finds all html element that holds data for each product.
-            - Loops through list of html elements for all product.
+            - Finds all HTML element that holds data for each product.
+            - Loops through list of HTML elements for all product.
             - Calls validateData method.
-            - Saves data to dataPerpage.
+            - Saves data to data_per_page.
         """
-        soup = BeautifulSoup(rawData, 'html.parser')
-        self.nextUrl = self.getNextUrl(soup)
-        dataPerPage = []
+        soup = BeautifulSoup(raw_data, 'html.parser')
+        self.next_url = self.get_next_url(soup)
+        data_per_page = []
 
         tags = soup.find_all("div",{'class':'product-card product-card-style-standard'})
         
@@ -137,71 +140,71 @@ class Extract():
             for tag in tags:
 
                 #get data with data type validation 
-                _data = self.validateData(tag)
+                _data = self.validate_data(tag)
 
-                dataPerRank = {
+                data_per_rank = {
                     f"Rank : {self.rank}" : {
                         "title" : _data.title,
                         "url" : _data.url,
                         "price": _data.price
                         }
                 }
-                dataPerPage.append(dataPerRank)
+                data_per_page.append(data_per_rank)
                 self.rank +=1
-        return dataPerPage
+        return data_per_page
     
-    def validateData(self, tag : BeautifulSoup):
+    def validate_data(self, tag):
         """
         Validates data type from Pydantic Model.
 
         Returns Data for a specific product.
 
         Args :
-            tag (BeautifulSoup) : represents the group of html elements that holds data for a specific product.
+            tag (BeautifulSoup) : represents the group of HTML elements that holds data for a specific product.
 
         Attributes :
             data (Pydantic) : new instance of a class Data.
 
-        Behaviour :
+        Behavior :
             - Calls methods getTitle, getURL and getPrice
             - Validates value if data type is correct using pydantic.
         """
         return DataModel(
-                    title = self.getTitle(tag),
-                    url = self.getUrl(tag),
-                    price = self.getPrice(tag)
+                    title = self.get_title(tag),
+                    url = self.get_url(tag),
+                    price = self.get_price(tag)
                 )
     
 
-    def getTitle(self, tag : BeautifulSoup) -> str:
+    def get_title(self, tag) -> str | None | Any:
         """
-        Naviagates and check if title exist in a target html element.
+        Navigates and check if title exist in a target HTML element.
 
         Returns the title of a product.
 
         Args :
-            tag (BeautifulSoup) : the html element for a product.
+            tag (BeautifulSoup) : the HTML element for a product.
         
         Attributes :
             title (str) : represents the title or product name of a product.
-            titleTag (str) : represents the html element where title can be found.
+            titleTag (str) : represents the HTML element where title can be found.
 
-        Behaviour :
+        Behavior :
             - Navigates to a specific tag where title of the product can be found.
             - fetch the title of a product.
         """
         try:
             title = 'Not Found'
-            titleTag = tag.find('p',{'class':'name product-title woocommerce-loop-product__title'}) or tag.find('a',{'class':'reversed-link'})
-            if titleTag:
-                title = titleTag.get_text().strip()
+            title_tag = tag.find('p',{'class':'name product-title woocommerce-loop-product__title'}) or tag.find('a',{'class':'reversed-link'})
+            if title_tag:
+                title = title_tag.get_text().strip()
+            return title
         except Exception as e:
             print(f'[x] Unhandled exception while fetching title on rank-{self.rank}: {e}')
-        return title
 
-    def getUrl(self, tag : BeautifulSoup) -> str:
+    def get_url(self, tag : BeautifulSoup) -> str | None:
         """
-        Navigate to html tag where url of a specific product can be found.
+        Navigate to HTML tag where url of a specific product can be found.
 
         Returns the URL of a specific product.
 
@@ -210,46 +213,46 @@ class Extract():
 
         Attribute :
             url (str) : represents the url of a specific product.
-            urlTag (BeautifulSoup) : represents the html element where url can be found.
+            urlTag (BeautifulSoup) : represents the HTML element where url can be found.
 
-        Behaviour : 
-            - Navigate to a specific html element where url of a specific product can be found.
-            - Check if the href attribute that holds the url exist in the target html element.
-            - fetch the URL from html tag.
+        Behavior :
+            - Navigate to a specific HTML element where url of a specific product can be found.
+            - Check if the href attribute that holds the url exist in the target HTML element.
+            - fetch the URL from HTML tag.
         """
         try:
             url = 'Not Found'
-            urlTag = tag.find('a',{'class':'reversed-link'})
-            if urlTag and urlTag.has_attr('href'):
-                url = urlTag['href']
+            url_tag = tag.find('a',{'class':'reversed-link'})
+            if url_tag and url_tag.has_attr('href'):
+                url = url_tag['href']
                 if not 'https:' in url:
                     url = f'https://urbangadgets.ph{url}'
+            return url
         except Exception as e:
             print(f'[x] Unhandled exception while fetching url on rank-{self.rank}: {e}')
-        return url
     
-    def getPrice(self, tag : BeautifulSoup) ->str:
+    def get_price(self, tag : BeautifulSoup) -> str | None:
         """
-        Navigates to a specific html element where price can be found.
+        Navigates to a specific HTML element where price can be found.
 
         Returns the price of a specific product.
 
         Args :
-            tag (BeautifulSoup) : represents the group of html elements that holds data for a specific product.
+            tag (BeautifulSoup) : represents the group of HTML elements that holds data for a specific product.
 
         Attributes :
             price (str) : represents the price for a specific product.
-            priceTag (BeautifulSoup) : the target html where price can be found.
+            priceTag (BeautifulSoup) : the target HTML where price can be found.
 
-        Behaviour :
+        Behavior :
             - Navigate to a specific tag that holds the price.
-            - fetch the price from html tag.
+            - fetch the price from HTML tag.
         """
         try:
             price : str = '0.00'
-            priceTag = tag.find('span',{'class':'price'}) or tag.find('span', {'class':'f-price-item f-price-item--sale'})
-            if priceTag:
-                price = priceTag.text
+            price_tag = tag.find('span',{'class':'price'}) or tag.find('span', {'class':'f-price-item f-price-item--sale'})
+            if price_tag:
+                price = price_tag.text
+            return price
         except Exception as e:
             print(f'[x] Unhandled exception while fetching price on rank-{self.rank}: {e}')
-        return price

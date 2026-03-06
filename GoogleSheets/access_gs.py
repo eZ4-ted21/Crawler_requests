@@ -1,8 +1,13 @@
+from typing import Any
+
 import gspread
 from google.oauth2.service_account import Credentials
-import os 
+import os
 
-class AccessGoogleSheet():
+from gspread import Spreadsheet
+
+
+class AccessGoogleSheet:
     """
     A class that represents Google Sheets connection.
 
@@ -15,8 +20,10 @@ class AccessGoogleSheet():
         """
         Initialize a new instance of the class with sheet.
         """
+        pass
 
-    def getWorkBook(self) -> gspread.spreadsheet.Spreadsheet:
+    @staticmethod
+    def _get_workbook() -> Spreadsheet | None:
         """
         Establish a connection to a Google Sheets workbook using service account credentials.
 
@@ -36,11 +43,12 @@ class AccessGoogleSheet():
             client = gspread.authorize(creds)
             sheet_id = gs_id
             workbook = client.open_by_key(sheet_id)
+            return workbook
         except Exception as e:
-            print(f'[x] Exeption encountered while getting access to google Workbook : {e}')
-        return workbook
+            print(f'[x] Exception encountered while getting access to google Workbook : {e}')
+
     
-    def getWorkSheet(self, sheet : str) -> gspread.worksheet.Worksheet:
+    def get_work_sheet(self, sheet : str) -> Any | None:
         """
         Retrieve a specific worksheet from the connected Google Sheets workbook.
 
@@ -53,8 +61,8 @@ class AccessGoogleSheet():
             - Logs an error message if the worksheet cannot be accessed.
         """
         try: 
-            workbook = self.getWorkBook()
-            newSheet = workbook.worksheet(sheet)
+            workbook = self._get_workbook()
+            new_sheet = workbook.worksheet(sheet)
+            return new_sheet
         except Exception as e:
-            print(f'[x] Exception ecncountered while getting access to worksheet : {e}')
-        return newSheet
+            print(f'[x] Exception encountered while getting access to worksheet : {e}')

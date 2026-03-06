@@ -12,7 +12,7 @@ if __name__ == '__main__':
     scraped_data = Extract(url).execute()
     print(scraped_data)
     sheet = 'Drones'
-    data = CleanData(scraped_data)._getListData()
-    SaveOutput(data).saveToCSV()
-    SaveOutput(data).saveToGoogleSheet(sheet)
-    # SaveOutput(data).saveToDB(uuid)
+    data = CleanData(scraped_data).get_list_data()
+    SaveOutput(data).save_to_csv()
+    SaveOutput(data).save_to_google_sheet(sheet)
+    # SaveOutput(data).save_to_db(uuid)

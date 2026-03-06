@@ -2,13 +2,13 @@ import psycopg2
 import os
 from psycopg2 import OperationalError
 
-class GetDBConnection():
-    '''
+class GetDBConnection:
+    """
     A class that represents database connection
 
     methods :
         getConnection() : establish database connection
-    '''
+    """
 
     def __init__(self):
         """
@@ -16,15 +16,16 @@ class GetDBConnection():
         """
         pass
 
-    def getConnection(self):
+    @staticmethod
+    def get_connection():
         """
-        connection (tupple) : established connection parameters such as port, host, dbname, user and password
+        connection (tuple) : established connection parameters such as port, host, dbname, user and password
         cursor : established connection cursor
         
-        Behaviour : 
+        Behavior :
             - established database connection
-            - checks if datbase connection status
-            - Returns databse connection
+            - checks if database connection status
+            - Returns database connection
         """
         try:
             connection = psycopg2.connect(
@@ -35,7 +36,6 @@ class GetDBConnection():
                 port=os.getenv('DB_PORT')
             )
             print("Connection established successfully!")
-
+            return connection
         except OperationalError as e:
             print("Error:", e)
-        return connection
